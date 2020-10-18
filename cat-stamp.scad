@@ -5,10 +5,11 @@ module cat_stamp(
     depth = 2,
     base = 2,
     rim = 1,
-    bleed = 0
+    bleed = 0,
+    scale = 1
 ) {
-    width = svg_width + rim * 2;
-    length = svg_length + rim * 2;
+    width = svg_width * scale + rim * 2;
+    length = svg_length * scale + rim * 2;
 
     e = .031;
 
@@ -16,7 +17,7 @@ module cat_stamp(
         translate([rim, rim, base - e]) {
             linear_extrude(depth + e) {
                 offset(delta = bleed) {
-                    resize([svg_width, svg_length]) {
+                    resize([svg_width * scale, svg_length * scale]) {
                         import("cat-stamp.svg");
                     }
                 }
