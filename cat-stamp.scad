@@ -1,3 +1,5 @@
+use <utils.scad>;
+
 svg_width = 11.951;
 svg_length = 10;
 
@@ -74,42 +76,29 @@ module cat_stamp(
     }
 }
 
-module test_bleeds(
-    bleeds = [
-        /* 0, // details lost here at all relief_scales */
-        .1, // details lost here and lower at relief_scale 1
-        /* .125, */
-        /* .15, */
-        /* .2 */
-    ],
-    scales = [
-        /* 1, */
-        1.25,
-        1.5
-    ]
+module output(
+    bleeds = [.125, .1, .1],
+    scales = [1, 1.25, 1.5]
 ) {
     gutter = 1;
-
-    plot = max(svg_width, svg_length) * max(scales);
+    base_rim = 2;
 
     for (i = [0 : len(bleeds) - 1]) {
-        for (ii = [0 : len(scales) - 1]) {
-            translate([
-                i * (svg_width * scales[ii] + gutter),
-                ii * (svg_length * scales[0] + gutter),
-                0
-            ]) {
-                cat_stamp(
-                    relief_bleed = bleeds[i],
-                    relief_scale = scales[ii],
-                    base_rim = gutter
-                );
-            }
+        x = i > 0
+            ? sum(slice(scales, 0, i)) * svg_width
+                + base_rim * i * 2
+                + gutter * i
+            : 0;
+
+        translate([x, 0, 0]) {
+            cat_stamp(
+                relief_bleed = bleeds[i],
+                relief_scale = scales[i],
+                base_rim = base_rim,
+                arrange_for_printer = true
+            );
         }
     }
 }
 
-cat_stamp(
-    relief_scale = 2,
-    arrange_for_printer = true
-);
+output();
