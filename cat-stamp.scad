@@ -8,6 +8,7 @@ module cat_stamp(
     bleed = 0,
     scale = 1,
     radius = 2,
+    arrange_for_printer = true,
     $fn = 12
 ) {
     width = svg_width * scale + rim * 2;
@@ -28,23 +29,37 @@ module cat_stamp(
     }
 
     module base() {
-        if (radius > 0) {
-            hull() {
-                for (x = [radius, width - radius]) {
-                    for (y = [radius, length - radius]) {
-                        translate([x, y, 0]) {
-                            cylinder(r = radius, h = base);
-                        }
+        hull() {
+            for (x = [radius + base, width - radius - base]) {
+                for (y = [radius + base, length - radius - base]) {
+                    translate([x, y, 0]) {
+                        cylinder(
+                            r = radius,
+                            h = e
+                        );
                     }
                 }
             }
-        } else {
-            cube([width, length, base]);
+
+            for (x = [radius, width - radius]) {
+                for (y = [radius, length - radius]) {
+                    translate([x, y, base - e]) {
+                        cylinder(
+                            r = radius,
+                            h = e
+                        );
+                    }
+                }
+            }
         }
     }
 
-    base();
-    # print(bleed);
+    rotate([arrange_for_printer ? 45 : 0, 0, 0]) {
+        translate([0, arrange_for_printer ? -base : 0, 0]) {
+            base();
+            # print(bleed);
+        }
+    }
 }
 
 module test_bleeds(
@@ -82,4 +97,7 @@ module test_bleeds(
     }
 }
 
-test_bleeds();
+cat_stamp(
+    scale = 2,
+    arrange_for_printer = false
+);
