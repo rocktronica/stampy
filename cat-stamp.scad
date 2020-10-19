@@ -2,25 +2,31 @@ svg_width = 11.951;
 svg_length = 10;
 
 module cat_stamp(
-    depth = 2,
-    base = 2,
-    rim = 1,
-    bleed = 0,
-    scale = 1,
-    radius = 2,
+    relief_depth = 2,
+    relief_bleed = 0,
+    relief_scale = 1,
+
+    base_height = 2,
+    base_radius = 2,
+    base_rim = 2,
+
     arrange_for_printer = true,
+
     $fn = 12
 ) {
-    width = svg_width * scale + rim * 2;
-    length = svg_length * scale + rim * 2;
+    width = svg_width * relief_scale + base_rim * 2;
+    length = svg_length * relief_scale + base_rim * 2;
 
     e = .031;
 
-    module print(bleed = 0) {
-        translate([rim, rim, base - e]) {
-            linear_extrude(depth + e) {
-                offset(delta = bleed) {
-                    resize([svg_width * scale, svg_length * scale]) {
+    module relief(relief_bleed = 0) {
+        translate([base_rim, base_rim, base_height - e]) {
+            linear_extrude(relief_depth + e) {
+                offset(delta = relief_bleed) {
+                    resize([
+                        svg_width * relief_scale,
+                        svg_length * relief_scale
+                    ]) {
                         import("cat-stamp.svg");
                     }
                 }
@@ -30,22 +36,28 @@ module cat_stamp(
 
     module base() {
         hull() {
-            for (x = [radius + base, width - radius - base]) {
-                for (y = [radius + base, length - radius - base]) {
+            for (x = [
+                base_radius + base_height,
+                width - base_radius - base_height
+            ]) {
+                for (y = [
+                    base_radius + base_height,
+                    length - base_radius - base_height
+                ]) {
                     translate([x, y, 0]) {
                         cylinder(
-                            r = radius,
+                            r = base_radius,
                             h = e
                         );
                     }
                 }
             }
 
-            for (x = [radius, width - radius]) {
-                for (y = [radius, length - radius]) {
-                    translate([x, y, base - e]) {
+            for (x = [base_radius, width - base_radius]) {
+                for (y = [base_radius, length - base_radius]) {
+                    translate([x, y, base_height - e]) {
                         cylinder(
-                            r = radius,
+                            r = base_radius,
                             h = e
                         );
                     }
@@ -55,17 +67,17 @@ module cat_stamp(
     }
 
     rotate([arrange_for_printer ? 45 : 0, 0, 0]) {
-        translate([0, arrange_for_printer ? -base : 0, 0]) {
+        translate([0, arrange_for_printer ? -base_height : 0, 0]) {
             base();
-            # print(bleed);
+            # relief(relief_bleed);
         }
     }
 }
 
 module test_bleeds(
     bleeds = [
-        /* 0, // details lost here at all scales */
-        .1, // details lost here and lower at scale 1
+        /* 0, // details lost here at all relief_scales */
+        .1, // details lost here and lower at relief_scale 1
         /* .125, */
         /* .15, */
         /* .2 */
@@ -88,9 +100,9 @@ module test_bleeds(
                 0
             ]) {
                 cat_stamp(
-                    bleed = bleeds[i],
-                    scale = scales[ii],
-                    rim = gutter
+                    relief_bleed = bleeds[i],
+                    relief_scale = scales[ii],
+                    base_rim = gutter
                 );
             }
         }
@@ -98,6 +110,6 @@ module test_bleeds(
 }
 
 cat_stamp(
-    scale = 2,
-    arrange_for_printer = false
+    relief_scale = 2,
+    arrange_for_printer = true
 );
