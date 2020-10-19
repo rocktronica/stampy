@@ -33,17 +33,37 @@ module cat_stamp(
     # print(bleed);
 }
 
-module test_bleeds(bleeds = [
-    /* .1, // details lost here or any lower */
-    .125,
-    .15,
-    .2
-]) {
+module test_bleeds(
+    bleeds = [
+        /* 0, // details lost here at all scales */
+        .1, // details lost here and lower at scale 1
+        /* .125, */
+        /* .15, */
+        /* .2 */
+    ],
+    scales = [
+        /* 1, */
+        1.25,
+        1.5
+    ]
+) {
     gutter = 1;
 
+    plot = max(svg_width, svg_length) * max(scales);
+
     for (i = [0 : len(bleeds) - 1]) {
-        translate([i * (svg_width + gutter), 0, 0]) {
-            cat_stamp(bleed = bleeds[i]);
+        for (ii = [0 : len(scales) - 1]) {
+            translate([
+                i * (svg_width * scales[ii] + gutter),
+                ii * (svg_length * scales[0] + gutter),
+                0
+            ]) {
+                cat_stamp(
+                    bleed = bleeds[i],
+                    scale = scales[ii],
+                    rim = gutter
+                );
+            }
         }
     }
 }
