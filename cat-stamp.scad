@@ -6,7 +6,9 @@ module cat_stamp(
     base = 2,
     rim = 1,
     bleed = 0,
-    scale = 1
+    scale = 1,
+    radius = 2,
+    $fn = 12
 ) {
     width = svg_width * scale + rim * 2;
     length = svg_length * scale + rim * 2;
@@ -26,7 +28,19 @@ module cat_stamp(
     }
 
     module base() {
-        cube([width, length, base]);
+        if (radius > 0) {
+            hull() {
+                for (x = [radius, width - radius]) {
+                    for (y = [radius, length - radius]) {
+                        translate([x, y, 0]) {
+                            cylinder(r = radius, h = base);
+                        }
+                    }
+                }
+            }
+        } else {
+            cube([width, length, base]);
+        }
     }
 
     base();
