@@ -13,9 +13,7 @@ module cat_stamp(
     base_radius = 2,
     base_rim = 2,
 
-    handle_diameter = 6,
     handle_length = 20,
-    handle_cavity_depth = 2.4,
 
     tolerance = .2,
 
@@ -25,6 +23,9 @@ module cat_stamp(
 ) {
     width = svg_width * relief_scale + base_rim * 2;
     length = svg_length * relief_scale + base_rim * 2;
+
+    handle_diameter = base_height + relief_depth;
+    handle_cavity_depth = base_height - .6;
 
     e = .031;
 
