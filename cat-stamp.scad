@@ -1,8 +1,9 @@
 use <threads.scad>;
 use <utils.scad>;
 
-svg_width = 11.951;
-svg_length = 10;
+svg_filename = "bees-and-cat-head.svg";
+svg_width = 48.13;
+svg_length = 14.22;
 
 module cat_stamp(
     relief_depth = 2,
@@ -59,7 +60,7 @@ module cat_stamp(
                         svg_width * relief_scale,
                         svg_length * relief_scale
                     ]) {
-                        import("cat-stamp.svg");
+                        import(svg_filename);
                     }
                 }
             }
@@ -137,8 +138,9 @@ module cat_stamp(
 }
 
 module output(
-    bleeds = [.125, .1, .1],
-    scales = [1, 1.25, 1.5]
+    /* -.1 bleed at 1 scale looks like it might work. -.2 and loses lines  */
+    bleeds = [-.1],
+    scales = [1]
 ) {
     gutter = 1;
     base_rim = 2;
