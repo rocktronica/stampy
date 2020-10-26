@@ -13,6 +13,11 @@ module case(
     tolerance = .1,
     clearance = .1, // .2 too loose for thread_pitch 1
     z_gutter = 0,
+
+    stamp_base_size = 17,
+    handle_length = 20,
+    handle_diameter = 7,
+
     debug = false
 ) {
     e = .031;
@@ -74,6 +79,66 @@ module case(
     }
 
     module bottom() {
+        clearance = .2;
+
+        module handle_holder(width = handle_length / 2) {
+            x = width / -2;
+
+            for (y = [
+                handle_diameter / -2 - wall - clearance,
+                handle_diameter / 2 + clearance
+            ]) {
+                translate([x, y, floor_ceiling - e])
+                cube([width, wall, handle_diameter + e]);
+            }
+
+            % translate([
+                handle_length / -2,
+                0,
+                floor_ceiling + handle_diameter / 2
+            ]) rotate([0, 90, 0]) {
+                cylinder(d = handle_diameter, h = handle_length);
+            }
+        }
+
+        module stamp_base_holder(x = 0, y = 0) {
+            overlap = stamp_base_size / 3;
+
+            translate([
+                stamp_base_size / -2 - clearance,
+                stamp_base_size / -2 - clearance,
+                floor_ceiling - e
+            ]) {
+                a = -wall;
+                b = stamp_base_size - overlap + clearance * 2;
+
+                difference() {
+                    union() {
+                        for (_x = [a, b]) for (_y = [a, b]) {
+                            translate([_x + x, _y + y, 0]) {
+                                cube([
+                                    wall + overlap,
+                                    wall + overlap,
+                                    handle_diameter + e
+                                ]);
+                            }
+                        }
+                    }
+
+                    translate([x, y, -e]) {
+                        cube([
+                            stamp_base_size + clearance * 2,
+                            stamp_base_size + clearance * 2,
+                            handle_diameter + e * 3
+                        ]);
+                    }
+                }
+            }
+        }
+
+        handle_holder();
+        stamp_base_holder();
+
         difference() {
             union() {
                 intersection() {
@@ -103,7 +168,7 @@ module case(
         }
     }
 
-    translate([0, 0, z_gutter]) top();
+    /* translate([0, 0, z_gutter]) top(); */
     bottom();
 }
 
