@@ -6,7 +6,7 @@ svg_width = 48.13;
 svg_length = 14.22;
 
 module cat_stamp(
-    relief_depth = 2,
+    relief_depth = 4,
     relief_bleed = 0,
     relief_scale = 1,
 
