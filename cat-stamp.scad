@@ -53,14 +53,16 @@ module cat_stamp(
     }
 
     module relief(relief_bleed = 0) {
-        translate([base_rim, base_rim, base_height - e]) {
-            linear_extrude(relief_depth + e) {
-                offset(delta = relief_bleed) {
-                    resize([
-                        svg_width * relief_scale,
-                        svg_length * relief_scale
-                    ]) {
-                        import(svg_filename);
+        mirror([1, 0, 0]) {
+            translate([base_rim - width, base_rim, base_height - e]) {
+                linear_extrude(relief_depth + e) {
+                    offset(delta = relief_bleed) {
+                        resize([
+                            svg_width * relief_scale,
+                            svg_length * relief_scale
+                        ]) {
+                            import(svg_filename);
+                        }
                     }
                 }
             }
