@@ -1,9 +1,9 @@
 use <threads.scad>;
 use <utils.scad>;
 
-svg_filename = "bees-and-cat-head.svg";
-svg_width = 48.13;
-svg_length = 14.22;
+svg_filename = "bee-edit.svg";
+svg_width = 12.62;
+svg_length = 12.647;
 
 module cat_stamp(
     relief_depth = 4,
