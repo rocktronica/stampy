@@ -1,13 +1,12 @@
 use <threads.scad>;
-use <utils.scad>;
-
-svg_filename = "bee-edit.svg";
-svg_width = 12.62;
-svg_length = 12.647;
 
 module cat_stamp(
+    svg_filename = "bee-edit.svg",
+    svg_width = 12.62,
+    svg_length = 12.647,
+
     relief_depth = 4,
-    relief_bleed = 0,
+    relief_bleed = -.1,
     relief_scale = 1,
 
     base_width = undef,
@@ -153,25 +152,21 @@ module cat_stamp(
 }
 
 module output(
-    /* -.1 bleed at 1 scale looks like it might work. -.2 and loses lines  */
-    bleeds = [-.1],
-    scales = [1]
+    svgs = [
+        // svg_filename, svg_width, svg_length
+        ["bee-edit.svg", 12.62, 12.647],
+    ],
+    plot = 18
 ) {
-    gutter = 1;
-    base_rim = 2;
+    for (i = [0 : len(svgs) - 1]) {
+        svg = svgs[i];
 
-    for (i = [0 : len(bleeds) - 1]) {
-        x = i > 0
-            ? sum(slice(scales, 0, i)) * svg_width
-                + base_rim * i * 2
-                + gutter * i
-            : 0;
-
-        translate([x, 0, 0]) {
+        translate([plot * i, 0, 0]) {
             cat_stamp(
-                relief_bleed = bleeds[i],
-                relief_scale = scales[i],
-                base_rim = base_rim,
+                svg_filename = svg[0],
+                svg_width = svg[1],
+                svg_length = svg[2],
+
                 base_width = 15,
                 base_length = 15,
                 arrange_for_printer = true
