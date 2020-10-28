@@ -5,7 +5,7 @@ module cat_stamp(
     svg_width = 12.62,
     svg_length = 12.647,
 
-    relief_depth = 4,
+    relief_depth = 6,
     relief_bleed = -.1,
     relief_scale = 1,
     relief_rotation = 0,
@@ -22,6 +22,7 @@ module cat_stamp(
 
     tolerance = .2,
 
+    include_handle = true,
     arrange_for_printer = true,
 
     $fn = 12
@@ -153,7 +154,9 @@ module cat_stamp(
         }
     }
 
-    handle();
+    if (include_handle) {
+        handle();
+    }
 
     rotate([arrange_for_printer ? 45 : 0, 0, 0]) {
         translate([0, arrange_for_printer ? -base_height : 0, 0]) {
@@ -170,13 +173,13 @@ module output(
         ["cat-smaller-mouth-edit.svg", 12.142, 10.028],
     ],
     rotations = [0, 90],
-    plot = 18
+    plot = 22
 ) {
     for (i = [0 : len(svgs) - 1]) {
         svg = svgs[i];
 
         for (ii = [0 : len(rotations) - 1]) {
-            translate([plot * i + plot * ii * 2, 0, 0]) {
+            translate([plot * i * 2 + plot * ii, 0, 0]) {
                 cat_stamp(
                     svg_filename = svg[0],
                     svg_width = svg[1],
@@ -184,8 +187,12 @@ module output(
 
                     relief_rotation = rotations[ii],
 
-                    base_width = 15,
-                    base_length = 15,
+                    base_width = 20,
+                    base_length = 20,
+
+                    handle_diameter = 9,
+
+                    include_handle = true,
                     arrange_for_printer = true
                 );
             }
