@@ -1,3 +1,4 @@
+use <donut.scad>;
 use <threads.scad>;
 
 module cat_stamp(
@@ -18,7 +19,7 @@ module cat_stamp(
     base_platform = 3,
 
     handle_diameter = undef,
-    handle_height = 20,
+    handle_height = 60,
 
     tolerance = .2,
 
@@ -132,7 +133,11 @@ module cat_stamp(
         }
     }
 
-    module handle(gutter = 2) {
+    module handle(
+        gutter = 2,
+        fillet = 2,
+        $fn = 24
+    ) {
         y = sqrt(pow(base_length - base_height * 2, 2) / 2)
             + handle_diameter / 2
             + gutter;
@@ -142,11 +147,13 @@ module cat_stamp(
             : [base_width / 2, base_length / 2, -handle_height];
 
         translate(position) {
-            cylinder(
-                d = handle_diameter,
-                h = handle_height,
-                $fn = 50
-            );
+            hull() {
+                donut(handle_diameter, fillet * 2, segments = $fn);
+
+                translate([0, 0, handle_height - e]) {
+                    cylinder(d = handle_diameter, h = e);
+                }
+            }
 
             translate([0, 0, handle_height]) {
                 threads(cavity = false);
