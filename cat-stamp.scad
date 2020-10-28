@@ -10,11 +10,14 @@ module cat_stamp(
     relief_bleed = 0,
     relief_scale = 1,
 
+    base_width = undef,
+    base_length = undef,
     base_height = 3,
     base_radius = 2,
     base_rim = 2,
 
-    handle_length = 20,
+    handle_diameter = undef,
+    handle_height = 20,
 
     tolerance = .2,
 
@@ -22,10 +25,16 @@ module cat_stamp(
 
     $fn = 12
 ) {
-    width = svg_width * relief_scale + base_rim * 2;
-    length = svg_length * relief_scale + base_rim * 2;
+    base_width = base_width != undef
+        ? base_width
+        : svg_width * relief_scale + base_rim * 2;
+    base_length = base_length != undef
+        ? base_length
+        : svg_length * relief_scale + base_rim * 2;
 
-    handle_diameter = base_height + relief_depth;
+    handle_diameter = handle_diameter != undef
+        ? handle_diameter
+        : base_height + relief_depth;
     handle_cavity_depth = base_height - .6;
 
     e = .031;
@@ -54,7 +63,11 @@ module cat_stamp(
 
     module relief(relief_bleed = 0) {
         mirror([1, 0, 0]) {
-            translate([base_rim - width, base_rim, base_height - e]) {
+            translate([
+                (base_width + svg_width * relief_scale) / -2,
+                svg_length * relief_scale / -2 + base_length / 2,
+                base_height - e
+            ]) {
                 linear_extrude(relief_depth + e) {
                     offset(delta = relief_bleed) {
                         resize([
@@ -74,11 +87,11 @@ module cat_stamp(
             hull() {
                 for (x = [
                     base_radius + base_height,
-                    width - base_radius - base_height
+                    base_width - base_radius - base_height
                 ]) {
                     for (y = [
                         base_radius + base_height,
-                        length - base_radius - base_height
+                        base_length - base_radius - base_height
                     ]) {
                         translate([x, y, 0]) {
                             cylinder(
@@ -89,8 +102,8 @@ module cat_stamp(
                     }
                 }
 
-                for (x = [base_radius, width - base_radius]) {
-                    for (y = [base_radius, length - base_radius]) {
+                for (x = [base_radius, base_width - base_radius]) {
+                    for (y = [base_radius, base_length - base_radius]) {
                         translate([x, y, base_height - e]) {
                             cylinder(
                                 r = base_radius,
@@ -101,29 +114,29 @@ module cat_stamp(
                 }
             }
 
-            translate([width / 2, length / 2, -e]) {
+            translate([base_width / 2, base_length / 2, -e]) {
                 threads(cavity = true, bleed = tolerance);
             }
         }
     }
 
     module handle(gutter = 2) {
-        y = sqrt(pow(length - base_height * 2, 2) / 2)
+        y = sqrt(pow(base_length - base_height * 2, 2) / 2)
             + handle_diameter / 2
             + gutter;
 
         position = arrange_for_printer
-            ? [width / 2, y, 0]
-            : [width / 2, length / 2, -handle_length];
+            ? [base_width / 2, y, 0]
+            : [base_width / 2, base_length / 2, -handle_height];
 
         translate(position) {
             cylinder(
                 d = handle_diameter,
-                h = handle_length,
+                h = handle_height,
                 $fn = 50
             );
 
-            translate([0, 0, handle_length]) {
+            translate([0, 0, handle_height]) {
                 threads(cavity = false);
             }
         }
@@ -159,6 +172,8 @@ module output(
                 relief_bleed = bleeds[i],
                 relief_scale = scales[i],
                 base_rim = base_rim,
+                base_width = 15,
+                base_length = 15,
                 arrange_for_printer = true
             );
         }
