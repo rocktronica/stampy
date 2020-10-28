@@ -155,6 +155,7 @@ module output(
     svgs = [
         // svg_filename, svg_width, svg_length
         ["bee-edit.svg", 12.62, 12.647],
+        ["cat-smaller-mouth-edit.svg", 12.142, 10.028],
     ],
     plot = 18
 ) {
