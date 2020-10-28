@@ -15,6 +15,7 @@ module cat_stamp(
     base_height = 3,
     base_radius = 2,
     base_rim = 2,
+    base_platform = 3,
 
     handle_diameter = undef,
     handle_height = 20,
@@ -35,7 +36,7 @@ module cat_stamp(
     handle_diameter = handle_diameter != undef
         ? handle_diameter
         : base_height + relief_depth;
-    handle_cavity_depth = base_height - .6;
+    handle_cavity_depth = base_height + base_platform - .6;
 
     e = .031;
 
@@ -65,7 +66,7 @@ module cat_stamp(
         translate([
             base_width / 2,
             base_length / 2,
-            base_height - e
+            base_height + base_platform - e
         ]) {
             mirror([1, 0, 0]) {
                 rotate([0, 0, relief_rotation]) {
@@ -112,11 +113,13 @@ module cat_stamp(
 
                 for (x = [base_radius, base_width - base_radius]) {
                     for (y = [base_radius, base_length - base_radius]) {
-                        translate([x, y, base_height - e]) {
-                            cylinder(
-                                r = base_radius,
-                                h = e
-                            );
+                        for (z = [base_height, base_height + base_platform]) {
+                            translate([x, y, z - e]) {
+                                cylinder(
+                                    r = base_radius,
+                                    h = e
+                                );
+                            }
                         }
                     }
                 }
