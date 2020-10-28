@@ -8,6 +8,7 @@ module cat_stamp(
     relief_depth = 4,
     relief_bleed = -.1,
     relief_scale = 1,
+    relief_rotation = 0,
 
     base_width = undef,
     base_length = undef,
@@ -61,19 +62,27 @@ module cat_stamp(
     }
 
     module relief(relief_bleed = 0) {
-        mirror([1, 0, 0]) {
-            translate([
-                (base_width + svg_width * relief_scale) / -2,
-                svg_length * relief_scale / -2 + base_length / 2,
-                base_height - e
-            ]) {
-                linear_extrude(relief_depth + e) {
-                    offset(delta = relief_bleed) {
-                        resize([
-                            svg_width * relief_scale,
-                            svg_length * relief_scale
-                        ]) {
-                            import(svg_filename);
+        translate([
+            base_width / 2,
+            base_length / 2,
+            base_height - e
+        ]) {
+            mirror([1, 0, 0]) {
+                rotate([0, 0, relief_rotation]) {
+                    translate([
+                        (svg_width * relief_scale) / -2,
+                        (svg_length * relief_scale) / -2,
+                        0
+                    ]) {
+                        linear_extrude(relief_depth + e) {
+                            offset(delta = relief_bleed) {
+                                resize([
+                                    svg_width * relief_scale,
+                                    svg_length * relief_scale
+                                ]) {
+                                    import(svg_filename);
+                                }
+                            }
                         }
                     }
                 }
@@ -157,21 +166,26 @@ module output(
         ["bee-edit.svg", 12.62, 12.647],
         ["cat-smaller-mouth-edit.svg", 12.142, 10.028],
     ],
+    rotations = [0, 90],
     plot = 18
 ) {
     for (i = [0 : len(svgs) - 1]) {
         svg = svgs[i];
 
-        translate([plot * i, 0, 0]) {
-            cat_stamp(
-                svg_filename = svg[0],
-                svg_width = svg[1],
-                svg_length = svg[2],
+        for (ii = [0 : len(rotations) - 1]) {
+            translate([plot * i + plot * ii * 2, 0, 0]) {
+                cat_stamp(
+                    svg_filename = svg[0],
+                    svg_width = svg[1],
+                    svg_length = svg[2],
 
-                base_width = 15,
-                base_length = 15,
-                arrange_for_printer = true
-            );
+                    relief_rotation = rotations[ii],
+
+                    base_width = 15,
+                    base_length = 15,
+                    arrange_for_printer = true
+                );
+            }
         }
     }
 }
