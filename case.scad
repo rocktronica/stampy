@@ -16,19 +16,20 @@ module case(
 
     engraving_depth = 1,
 
+    relief_depth = 6,
     base_platform = 3,
     base_height = 6,
     base_size = 20,
     handle_height = 60,
     handle_diameter = 9,
 
-    inner_wall = 2,
+    inner_wall = 2.4,
 
     z_gutter = 0,
     debug = true,
     bisect = true
 ) {
-    height = 2 * (base_platform + base_height)
+    height = 2 * (base_platform + base_height + relief_depth)
         + floor_ceiling * 2
         + vertical_clearance;
 
@@ -91,7 +92,7 @@ module case(
     }
 
     module holders() {
-        clearance = .1;
+        fit_clearance = -.05; // intentionally tight
 
         module handle_holder(width = wall * 3, end_gutter = wall) {
             for (x = [
@@ -99,8 +100,8 @@ module case(
                 handle_height / 2 - width - end_gutter
             ]) {
                 for (y = [
-                    handle_diameter / -2 - inner_wall - clearance,
-                    handle_diameter / 2 + clearance
+                    handle_diameter / -2 - inner_wall - fit_clearance,
+                    handle_diameter / 2 + fit_clearance
                 ]) {
                     translate([x, y, 0]) {
                         cube([width, inner_wall, handle_diameter]);
@@ -118,24 +119,27 @@ module case(
         }
 
         module base_holder() {
-            overlap = base_size / 3;
+            xy_overlap = base_size / 3;
+            z_overlap = 2;
 
             translate([
-                base_size / -2 - clearance,
-                base_size / -2 - clearance,
+                base_size / -2 - fit_clearance,
+                base_size / -2 - fit_clearance,
                 0
             ]) {
                 a = -inner_wall;
-                b = base_size - overlap + clearance * 2;
+                b = base_size - xy_overlap + fit_clearance * 2;
+
+                full_height = base_height + base_platform + relief_depth;
 
                 difference() {
                     union() {
                         for (p = [[a,a], [b,b]]) {
                             translate([p.x, p.y, 0]) {
                                 cube([
-                                    inner_wall + overlap,
-                                    inner_wall + overlap,
-                                    base_height
+                                    inner_wall + xy_overlap,
+                                    inner_wall + xy_overlap,
+                                    handle_diameter + z_overlap
                                 ]);
                             }
                         }
@@ -143,18 +147,18 @@ module case(
 
                     translate([0, 0, -e]) {
                         cube([
-                            base_size + clearance * 2,
-                            base_size + clearance * 2,
-                            base_height + e * 2
+                            base_size + fit_clearance * 2,
+                            base_size + fit_clearance * 2,
+                            full_height + e * 2
                         ]);
                     }
                 }
 
-                % translate([clearance, clearance, 0]) {
+                % translate([fit_clearance, fit_clearance, 0]) {
                     cube([
                         base_size,
                         base_size,
-                        handle_diameter
+                        full_height + e
                     ]);
                 }
             }
