@@ -3,22 +3,22 @@ use <threads.scad>;
 
 module case(
     diameter = 90,
-    floor_ceiling = 2,
+    floor_ceiling = 1.4,
     fillet = 5,
     wall = 4,
 
     thread_length = 4,
     thread_pitch = 2,
     tolerance = .1,
-    clearance = .1,
+    clearance = .2,
 
     vertical_clearance = 2,
 
-    engraving_depth = 1,
+    engraving_depth = .8,
 
     relief_depth = 6,
     base_platform = 3,
-    base_height = 6,
+    base_height = 3,
     base_size = 20,
     handle_height = 60,
     handle_diameter = 9,
@@ -121,7 +121,7 @@ module case(
         }
 
         module base_holder(
-            fit_clearance = 0
+            fit_clearance = .05
         ) {
             xy_overlap = base_size / 3;
             z_overlap = 2;
@@ -143,7 +143,7 @@ module case(
                                 cube([
                                     inner_wall + xy_overlap,
                                     inner_wall + xy_overlap,
-                                    handle_diameter + z_overlap
+                                    base_height + base_platform + z_overlap
                                 ]);
                             }
                         }
@@ -204,6 +204,26 @@ module case(
         }
     }
 
+    module gripper_cavities(count = 24, width = 6, length = 1.2) {
+        for (i = [0 : count - 1]) {
+            rotate([0, 0, (i / count) * 360]) {
+                translate([width / -2, diameter / 2 - length, -e]) {
+                    * % cube([width, length + e, height / 2 + e * 2]);
+                }
+
+                translate([0, diameter / 2, -e]) {
+                    scale([width / length, 1, 1]) {
+                        cylinder(
+                            d = length,
+                            h = height + e * 2,
+                            $fn = 12
+                        );
+                    }
+                }
+            }
+        }
+    }
+
     module bottom() {
         difference() {
             union() {
@@ -222,6 +242,8 @@ module case(
                 "bee-edit.svg", 12.62, 12.647,
                 z = -e
             );
+
+            gripper_cavities();
         }
 
         translate([0, 0, floor_ceiling - e]) {
@@ -248,6 +270,8 @@ module case(
                 "cat-smaller-mouth-edit.svg", 12.142, 10.028,
                 z = height - engraving_depth
             );
+
+            gripper_cavities();
         }
 
         translate([0, 0, height - floor_ceiling + e]) {
