@@ -92,9 +92,11 @@ module case(
     }
 
     module holders() {
-        fit_clearance = -.05; // intentionally tight
-
-        module handle_holder(width = wall * 3, end_gutter = wall) {
+        module handle_holder(
+            fit_clearance = -.05, // intentionally tight
+            width = wall * 3,
+            end_gutter = wall
+        ) {
             for (x = [
                 handle_height / -2 + end_gutter,
                 handle_height / 2 - width - end_gutter
@@ -118,7 +120,9 @@ module case(
             }
         }
 
-        module base_holder() {
+        module base_holder(
+            fit_clearance = 0
+        ) {
             xy_overlap = base_size / 3;
             z_overlap = 2;
 
