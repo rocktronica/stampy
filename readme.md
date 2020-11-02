@@ -2,6 +2,8 @@
 
 OpenSCAD code for 3D-printed stamps, made especially for pottery.
 
+![stampy example on pink Play-Doh](stampy.jpg)
+
 ## Images
 
 Images are SVG files, flattened to work with OpenSCAD.
